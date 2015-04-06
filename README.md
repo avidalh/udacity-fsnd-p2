@@ -18,10 +18,9 @@ All tests in `tournament_test.py` passed and the function
 tournament.
 
 `testPairings_advanced(debug_level)` has three possible debugging levels:
-* 0: no debug info, this is the default option (mute mode).
-* 1: debug messages level 1, before and after the functions calls.
-* 2: debug messages level 2, idem level 1 plus information from inside functions.
+* `testPairings_advanced(0)`: no debug info, this is the default option (mute mode).
+* `testPairings_advanced(1)`: debug messages level 1, before and after the functions calls.
+* `testPairings_advanced(2)`: debug messages level 2, idem level 1 plus information from inside functions.
 
 In debug mode (1 or 2) the system ask for the number of players in the 
-tournament, enter the number and hit <enter>, and hit <enter> again in every
- round 
+tournament, enter the number and hit <enter>, and hit <enter> again in every round 

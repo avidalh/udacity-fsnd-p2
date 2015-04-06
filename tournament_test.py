@@ -143,8 +143,10 @@ def print_query(query, debug_level):
         y.add_column(col_names[i],[row[i] for row in rows])
         y.align[col_names[i]]="r"
     y.align[col_names[1]]="l"
-    if debug_level: print query
-    if debug_level: print y
+    if debug_level:
+        print query
+    if debug_level:
+        print y
 
 
 def testPairings_advanced(debug_level=0):
@@ -184,7 +186,8 @@ def testPairings_advanced(debug_level=0):
 
         if pairings == []:
             if debug_level: 
-                print "all possible combinations covered, tournament ended successfully!"
+                print "all possible combinations covered, tournament ended " \
+                      "successfully! "
             break
 
         for pair in pairings:
@@ -200,7 +203,8 @@ def testPairings_advanced(debug_level=0):
 
         if rnd == max_rounds:
             if debug_level: 
-                print "reached the needed number of rounds to get a champion, tournament ended successfully!"
+                print "reached the needed number of rounds to get a champion," \
+                      " tournament ended successfully! "
             print "9. A complete tournament ended successfully!."
             break
 

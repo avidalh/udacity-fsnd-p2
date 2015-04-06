@@ -1,5 +1,5 @@
 -- This file is for DELETE all views, tables and database
--- use with carefull
+-- USE WITH CAREFULL!
 
 DROP VIEW view_standings;
 DROP VIEW view_matches;
