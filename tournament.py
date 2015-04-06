@@ -133,6 +133,9 @@ def swissPairings(debug_level=0):
         id2: the second player's unique id
         name2: the second player's name
     """
+
+    # in first instance read the list of matches played (even if it is empty)
+    # by means of a SQL view
     db = connect()
     c = db.cursor()
     c.execute("SELECT id1, player1, id2, player2 FROM view_matches")
@@ -142,18 +145,25 @@ def swissPairings(debug_level=0):
     if debug_level>1: 
         print '   matches: ', matches  
     
+    # now read the list of players sorted by rank descending
+    # here is used another SQL view
     db = connect()
     c = db.cursor()
     c.execute("SELECT id, name, bye FROM view_standings")
     players = c.fetchall()
     db.close()
+
+    #check the number of players for even or odd
+    # if odd: take the last player and assign him/her a "bye" flag and 
+    # give a "free win" 
+    # 
     if len(players) % 2:
         if debug_level>1:
             print '   odd players'
         for player in reversed(players):
-            if player[2] == 0:
+            if player[2] == 0: 
                 if debug_level>1:
-                    print '   found player with bye =0, poping it from the list'
+                    print '   found player with bye = 0, poping it from the list'
                 players.pop()
                 db = connect()
                 c = db.cursor()
