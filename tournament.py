@@ -53,7 +53,7 @@ def registerPlayer(name):
     """
     db = connect()
     c = db.cursor()
-    c.execute("INSERT INTO players(name,matches,winned,bye) \
+    c.execute("INSERT INTO players(name,matches,won,bye) \
                     VALUES(%s,0,0,0)", (name,))
     db.commit()
     db.close()
@@ -69,13 +69,13 @@ def playerStandings():
       A list of tuples, each of which contains (id, name, wins, matches):
         id: the player's unique id (assigned by the database)
         name: the player's full name (as registered)
-        wins: the number of matches the player has winned
+        wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
     db = connect()
     c = db.cursor()
-    c.execute("SELECT id, name, winned, matches \
-                    FROM players ORDER BY winned DESC")
+    c.execute("SELECT id, name, won, matches \
+                    FROM players ORDER BY won DESC")
     standings = c.fetchall()
     db.close()
     return standings;
@@ -85,12 +85,12 @@ def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
 
     Args:
-      winner:  the id number of the player who winned
+      winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
     db = connect()
     c = db.cursor()
-    c.execute("UPDATE players SET winned = winned+1, matches = matches+1 \
+    c.execute("UPDATE players SET won = won+1, matches = matches+1 \
                     WHERE id = %s", (winner,))
     db.commit()
     c.execute("UPDATE players SET matches = matches+1 WHERE id = %s", (loser,))
@@ -171,7 +171,7 @@ def swissPairings(debug_level=0):
                 players.pop()
                 db = connect()
                 c = db.cursor()
-                c.execute("UPDATE players SET winned = winned+1, bye = 1 \
+                c.execute("UPDATE players SET won = won+1, bye = 1 \
                                 WHERE id = %s", (player[0],))
                 db.commit() 
                 db.close()

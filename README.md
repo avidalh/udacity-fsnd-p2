@@ -40,7 +40,7 @@ Enter number of players:  3
 Players:
 SELECT * FROM view_standings ORDER BY id;
 +------+----------+---------+--------+------+-----+
-|   id | name     | matches | winned | lost | bye |
+|   id | name     | matches | won | lost | bye |
 +------+----------+---------+--------+------+-----+
 | 2687 | Player_1 |       0 |      0 |    0 |   0 |
 | 2688 | Player_2 |       0 |      0 |    0 |   0 |
@@ -58,7 +58,7 @@ SELECT * FROM view_matches;
 round 1 standings
 SELECT * FROM view_standings;
 +------+----------+---------+--------+------+-----+
-|   id | name     | matches | winned | lost | bye |
+|   id | name     | matches | won | lost | bye |
 +------+----------+---------+--------+------+-----+
 | 2689 | Player_3 |       0 |      1 |    0 |   1 |
 | 2687 | Player_1 |       1 |      1 |    0 |   0 |
@@ -76,7 +76,7 @@ SELECT * FROM view_matches;
 round 2 standings
 SELECT * FROM view_standings;
 +------+----------+---------+--------+------+-----+
-|   id | name     | matches | winned | lost | bye |
+|   id | name     | matches | won | lost | bye |
 +------+----------+---------+--------+------+-----+
 | 2689 | Player_3 |       1 |      2 |    0 |   1 |
 | 2688 | Player_2 |       1 |      1 |    1 |   1 |
