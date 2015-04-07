@@ -24,7 +24,7 @@ tournament.
 
 In debug mode (1 or 2) the system ask for the number of players in the 
 tournament, enter the number and hit <enter>, and hit <enter> again in every round.
-The output is something like this:
+The output in debug mode 1 is something like this:
 ```
 $ python tournament_test.py 
 1. Old matches can be deleted.
