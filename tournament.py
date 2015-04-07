@@ -216,27 +216,3 @@ def swissPairings(debug_level=0):
                 print '   pair_to_test IN matches, no insertion'
 
     return pairs
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
