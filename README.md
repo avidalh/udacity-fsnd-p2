@@ -23,4 +23,65 @@ tournament.
 * `testPairingsAdvanced(2)`: debug messages level 2, idem level 1 plus information from inside functions.
 
 In debug mode (1 or 2) the system ask for the number of players in the 
-tournament, enter the number and hit <enter>, and hit <enter> again in every round 
+tournament, enter the number and hit <enter>, and hit <enter> again in every round.
+The output is something like this:
+`
+$ python tournament_test.py 
+1. Old matches can be deleted.
+2. Player records can be deleted.
+3. After deleting, countPlayers() returns zero.
+4. After registering a player, countPlayers() returns 1.
+5. Players can be registered and deleted.
+6. Newly registered players appear in the standings with no matches.
+7. After a match, players have updated standings.
+8. After one match, players with one win are paired.
+Tournament simulation
+Enter number of players:  3
+Players:
+SELECT * FROM view_standings ORDER BY id;
++------+----------+---------+--------+------+-----+
+|   id | name     | matches | winned | lost | bye |
++------+----------+---------+--------+------+-----+
+| 2687 | Player_1 |       0 |      0 |    0 |   0 |
+| 2688 | Player_2 |       0 |      0 |    0 |   0 |
+| 2689 | Player_3 |       0 |      0 |    0 |   0 |
++------+----------+---------+--------+------+-----+
+execution paused, press <ENTER> 
+max_rounds:  2
+pairing / round 1 results
+SELECT * FROM view_matches;
++------+----------+------+----------+-----------+
+|  id1 | player1  |  id2 |  player2 | winner id |
++------+----------+------+----------+-----------+
+| 2687 | Player_1 | 2688 | Player_2 |      2687 |
++------+----------+------+----------+-----------+
+round 1 standings
+SELECT * FROM view_standings;
++------+----------+---------+--------+------+-----+
+|   id | name     | matches | winned | lost | bye |
++------+----------+---------+--------+------+-----+
+| 2689 | Player_3 |       0 |      1 |    0 |   1 |
+| 2687 | Player_1 |       1 |      1 |    0 |   0 |
+| 2688 | Player_2 |       1 |      0 |    1 |   0 |
++------+----------+---------+--------+------+-----+
+execution paused, press <ENTER> 
+pairing / round 2 results
+SELECT * FROM view_matches;
++------+----------+------+----------+-----------+
+|  id1 | player1  |  id2 |  player2 | winner id |
++------+----------+------+----------+-----------+
+| 2687 | Player_1 | 2688 | Player_2 |      2687 |
+| 2689 | Player_3 | 2687 | Player_1 |      2689 |
++------+----------+------+----------+-----------+
+round 2 standings
+SELECT * FROM view_standings;
++------+----------+---------+--------+------+-----+
+|   id | name     | matches | winned | lost | bye |
++------+----------+---------+--------+------+-----+
+| 2689 | Player_3 |       1 |      2 |    0 |   1 |
+| 2688 | Player_2 |       1 |      1 |    1 |   1 |
+| 2687 | Player_1 |       2 |      1 |    1 |   0 |
++------+----------+---------+--------+------+-----+
+reached the needed number of rounds to get a champion, tournament ended successfully! 
+9. A complete tournament ended successfully!.
+Success!  All tests pass!`
