@@ -26,7 +26,7 @@ In debug mode (1 or 2) the system ask for the number of players in the
 tournament, enter the number, hit `<enter>`, and hit `<enter>` again in every round.
 The output in debug mode 1 is something like this:
 ```
-$ python tournament_test.py 
+python tournament_test.py 
 1. Old matches can be deleted.
 2. Player records can be deleted.
 3. After deleting, countPlayers() returns zero.
@@ -39,49 +39,49 @@ Tournament simulation
 Enter number of players:  3
 Players:
 SELECT * FROM view_standings ORDER BY id;
-+------+----------+---------+--------+------+-----+
-|   id | name     | matches | won | lost | bye |
-+------+----------+---------+--------+------+-----+
-| 2687 | Player_1 |       0 |      0 |    0 |   0 |
-| 2688 | Player_2 |       0 |      0 |    0 |   0 |
-| 2689 | Player_3 |       0 |      0 |    0 |   0 |
-+------+----------+---------+--------+------+-----+
++----+----------+---------+-----+------+-----+
+| id | name     | matches | won | lost | bye |
++----+----------+---------+-----+------+-----+
+| 36 | Player_1 |       0 |   0 |    0 |   0 |
+| 37 | Player_2 |       0 |   0 |    0 |   0 |
+| 38 | Player_3 |       0 |   0 |    0 |   0 |
++----+----------+---------+-----+------+-----+
 execution paused, press <ENTER> 
 max_rounds:  2
 pairing / round 1 results
 SELECT * FROM view_matches;
-+------+----------+------+----------+-----------+
-|  id1 | player1  |  id2 |  player2 | winner id |
-+------+----------+------+----------+-----------+
-| 2687 | Player_1 | 2688 | Player_2 |      2687 |
-+------+----------+------+----------+-----------+
++-----+----------+-----+----------+-----------+
+| id1 | player1  | id2 |  player2 | winner id |
++-----+----------+-----+----------+-----------+
+|  36 | Player_1 |  37 | Player_2 |        36 |
++-----+----------+-----+----------+-----------+
 round 1 standings
 SELECT * FROM view_standings;
-+------+----------+---------+--------+------+-----+
-|   id | name     | matches | won | lost | bye |
-+------+----------+---------+--------+------+-----+
-| 2689 | Player_3 |       0 |      1 |    0 |   1 |
-| 2687 | Player_1 |       1 |      1 |    0 |   0 |
-| 2688 | Player_2 |       1 |      0 |    1 |   0 |
-+------+----------+---------+--------+------+-----+
++----+----------+---------+-----+------+-----+
+| id | name     | matches | won | lost | bye |
++----+----------+---------+-----+------+-----+
+| 38 | Player_3 |       0 |   1 |    0 |   1 |
+| 36 | Player_1 |       1 |   1 |    0 |   0 |
+| 37 | Player_2 |       1 |   0 |    1 |   0 |
++----+----------+---------+-----+------+-----+
 execution paused, press <ENTER> 
 pairing / round 2 results
 SELECT * FROM view_matches;
-+------+----------+------+----------+-----------+
-|  id1 | player1  |  id2 |  player2 | winner id |
-+------+----------+------+----------+-----------+
-| 2687 | Player_1 | 2688 | Player_2 |      2687 |
-| 2689 | Player_3 | 2687 | Player_1 |      2689 |
-+------+----------+------+----------+-----------+
++-----+----------+-----+----------+-----------+
+| id1 | player1  | id2 |  player2 | winner id |
++-----+----------+-----+----------+-----------+
+|  36 | Player_1 |  37 | Player_2 |        36 |
+|  38 | Player_3 |  36 | Player_1 |        38 |
++-----+----------+-----+----------+-----------+
 round 2 standings
 SELECT * FROM view_standings;
-+------+----------+---------+--------+------+-----+
-|   id | name     | matches | won | lost | bye |
-+------+----------+---------+--------+------+-----+
-| 2689 | Player_3 |       1 |      2 |    0 |   1 |
-| 2688 | Player_2 |       1 |      1 |    1 |   1 |
-| 2687 | Player_1 |       2 |      1 |    1 |   0 |
-+------+----------+---------+--------+------+-----+
++----+----------+---------+-----+------+-----+
+| id | name     | matches | won | lost | bye |
++----+----------+---------+-----+------+-----+
+| 38 | Player_3 |       1 |   2 |    0 |   1 |
+| 37 | Player_2 |       1 |   1 |    1 |   1 |
+| 36 | Player_1 |       2 |   1 |    1 |   0 |
++----+----------+---------+-----+------+-----+
 reached the needed number of rounds to get a champion, tournament ended successfully! 
 9. A complete tournament ended successfully!.
 Success!  All tests pass!
