@@ -23,7 +23,7 @@ tournament.
 * `testPairingsAdvanced(2)`: debug messages level 2, idem level 1 plus information from inside functions.
 
 In debug mode (1 or 2) the system ask for the number of players in the 
-tournament, enter the number and hit <enter>, and hit <enter> again in every round.
+tournament, enter the number, hit `<enter>`, and hit `<enter>` again in every round.
 The output in debug mode 1 is something like this:
 ```
 $ python tournament_test.py 
