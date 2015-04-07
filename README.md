@@ -11,7 +11,7 @@ in tournament.
 
 To run the program type `python tournament_test.py`.
 
-The function swissPairing(s) has support for even and odd number of players.
+The function swissPairing(s) has support for both even and odd number of players.
 
 All tests in `tournament_test.py` passed and the function 
 `testPairings_advanced()` has been added to in order to recreate a full 
