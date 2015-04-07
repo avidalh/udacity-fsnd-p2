@@ -147,7 +147,7 @@ def print_query(query):
     print y
 
 
-def testPairings_advanced(debug_level=0):
+def testPairingsAdvanced(debug_level=0):
     """
     advanced test to check a complete tournament.
     enter the number of players (even or odd) and the function simulates 
@@ -178,9 +178,13 @@ def testPairings_advanced(debug_level=0):
     # create players names and insert them into DB 
     for i in range(int(players_number)):
         registerPlayer('Player_%d' % (i+1))
+
+    # in debug mode shows the generated list of players
     if debug_level:
         print 'Players:'
         print_query("SELECT * FROM view_standings ORDER BY id;")
+        print 'execution paused, press <ENTER>',
+        raw_input()
 
     # calculate the number of rounds in the tournament
     # max rounds will be the upper nearest int of log(base2)(players number)
@@ -241,9 +245,9 @@ if __name__ == '__main__':
     testPairings()
 
     # use as you like:
-    # testPairings_advanced()   # no info shown
-    # testPairings_advanced(1)  # debug level 1 (info..)
-    # testPairings_advanced(2)  # debug level 2 (more info...)
-    testPairings_advanced(1)
+    # testPairingsAdvanced()   # no info shown
+    # testPairingsAdvanced(1)  # debug level 1 (info..)
+    # testPairingsAdvanced(2)  # debug level 2 (more info...)
+    testPairingsAdvanced(1)
 
     print "Success!  All tests pass!"

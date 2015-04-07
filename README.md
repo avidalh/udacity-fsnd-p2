@@ -14,13 +14,13 @@ To run the program type `python tournament_test.py`.
 The function swissPairing(s) has support for both even and odd number of players.
 
 All tests in `tournament_test.py` passed and the function 
-`testPairings_advanced()` has been added to in order to recreate a full 
+`testPairingsAdvanced()` has been added to in order to recreate a full 
 tournament.
 
-`testPairings_advanced(debug_level)` has three possible debugging levels:
-* `testPairings_advanced(0)`: no debug info, this is the default option (mute mode).
-* `testPairings_advanced(1)`: debug messages level 1, before and after the functions calls.
-* `testPairings_advanced(2)`: debug messages level 2, idem level 1 plus information from inside functions.
+`testPairingsAdvanced(debug_level)` has three possible debugging levels:
+* `testPairingsAdvanced(0)`: no debug info, this is the default option (mute mode).
+* `testPairingsAdvanced(1)`: debug messages level 1, before and after the functions calls.
+* `testPairingsAdvanced(2)`: debug messages level 2, idem level 1 plus information from inside functions.
 
 In debug mode (1 or 2) the system ask for the number of players in the 
 tournament, enter the number and hit <enter>, and hit <enter> again in every round 
