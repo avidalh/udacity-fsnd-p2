@@ -127,7 +127,7 @@ def testPairings():
     print "8. After one match, players with one win are paired."
 
 
-def print_query(query, debug_level):
+def print_query(query):
     """
     print the query array in the psql way to easy view of the database tables
     """
@@ -143,64 +143,80 @@ def print_query(query, debug_level):
         y.add_column(col_names[i],[row[i] for row in rows])
         y.align[col_names[i]]="r"
     y.align[col_names[1]]="l"
-    if debug_level:
-        print query
-    if debug_level:
-        print y
+    print query
+    print y
 
 
 def testPairings_advanced(debug_level=0):
     """
     advanced test to check a complete tournament.
     enter the number of players (even or odd) and the function simulates 
-    the rounds setting a random winner/loser in each match.
+    the tournament rounds setting a winner/loser in each match.
     To view the output info set debug_level to 1 or 2 in the source code. 
     In each round the standings and matches table are displayed.
     """
     deleteMatches()
     deletePlayers()    
     
+    # in debug mode ask for the number of players, if normal mode uses 8
+    # players must be more than one...
     if debug_level:
         print "Tournament simulation"
         print "Enter number of players: ",
-        players_number = raw_input()
+        players_number = 0
+        while True:
+            players_number = raw_input()
+            try: 
+                if int(players_number) >1:
+                    break
+            except:
+                pass
+            print "Enter number of players (must be more than one!): ",
     else: 
         players_number = 8
 
+    # create players names and insert them into DB 
     for i in range(int(players_number)):
         registerPlayer('Player_%d' % (i+1))
-    if debug_level: print 'Players:'
-    print_query("SELECT * FROM view_standings;", debug_level)
+    if debug_level:
+        print 'Players:'
+        print_query("SELECT * FROM view_standings ORDER BY id;")
 
-    rnd = 0
+    # calculate the number of rounds in the tournament
     # max rounds will be the upper nearest int of log(base2)(players number)
     max_rounds = int(ceil(log(int(players_number), 2)))
-    if debug_level: print 'max_rounds: ', max_rounds
+    if debug_level:
+        print 'max_rounds: ', max_rounds
+    rnd = 0
+    
+    # looping until tournament ends...
     while True:
         rnd += 1
-
         pairs = []
+
+        # call the function to pairing the players
         pairings =  swissPairings(debug_level)
         
-        if debug_level>1: print 'pairings: ', pairings
+        if debug_level > 1:
+            print 'pairings: ', pairings
 
-        if pairings == []:
-            if debug_level: 
-                print "all possible combinations covered, tournament ended " \
-                      "successfully! "
-            break
-
+        # create a pairs list with only the players ID
         for pair in pairings:
             pairs.append((pair[0], pair[2]))
 
+        # and use it to report the matches results
         for pair in pairs:
             reportMatch(pair[0], pair[1])
 
-        if debug_level: print 'pairing / round %s results' % rnd
-        print_query("SELECT * FROM view_matches;", debug_level)
-        if debug_level: print('round %d standings' % rnd)
-        print_query("SELECT * FROM view_standings;", debug_level)
+        # debugging info
+        if debug_level:
+            print 'pairing / round %s results' % rnd
+            print_query("SELECT * FROM view_matches;")
+        if debug_level:
+            print('round %d standings' % rnd)
+            print_query("SELECT * FROM view_standings;")
 
+        # if rounds exhausted the tournament ends
         if rnd == max_rounds:
             if debug_level: 
                 print "reached the needed number of rounds to get a champion," \
@@ -208,6 +224,7 @@ def testPairings_advanced(debug_level=0):
             print "9. A complete tournament ended successfully!."
             break
 
+        # pause to evaluate the debug info in each round
         if debug_level: 
             print 'execution paused, press <ENTER>',
             raw_input()
@@ -223,10 +240,10 @@ if __name__ == '__main__':
     testReportMatches()
     testPairings()
 
+    # use as you like:
     # testPairings_advanced()   # no info shown
     # testPairings_advanced(1)  # debug level 1 (info..)
     # testPairings_advanced(2)  # debug level 2 (more info...)
-    
     testPairings_advanced(1)
 
     print "Success!  All tests pass!"

@@ -6,12 +6,15 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
+
 -- First of all create the database
 CREATE DATABASE tournament;
+
 
 -- Connect with it, is a postgresql specific command so review if other system
 -- is used 
 \c tournament;
+
 
 -- Players table, used to store player's information
 CREATE TABLE players(
@@ -22,6 +25,7 @@ CREATE TABLE players(
 	bye int							--used in tournaments with odd players
 	);
 
+
 -- matches table, used for store pairings and results of every match
 CREATE TABLE matches(					
 	id1 int REFERENCES players(id), --player 1 in the match
@@ -30,12 +34,14 @@ CREATE TABLE matches(
 	PRIMARY KEY (id1, id2)			--primary key player's id.
 	);
 
+
 -- some usefull views
--- view the standings
+-- view the standings sorted by matches winned
 CREATE VIEW view_standings AS
 	SELECT id, name, matches, winned, matches+bye-winned as lost, bye 
 		FROM players 
 		ORDER BY winned DESC;
+
 
 -- view the matches with player's name and winner 
 CREATE VIEW view_matches AS

@@ -4,6 +4,8 @@
 #
 
 import psycopg2
+
+# used for generate pairs
 from itertools import combinations
 
 
@@ -14,7 +16,6 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    
     db = connect()
     c = db.cursor()
     c.execute("DELETE FROM matches")
@@ -24,7 +25,6 @@ def deleteMatches():
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    
     db = connect()
     c = db.cursor()
     c.execute("DELETE FROM players")
@@ -34,7 +34,6 @@ def deletePlayers():
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    
     db = connect()
     c = db.cursor()
     c.execute("SELECT count(id)from players")
@@ -54,7 +53,8 @@ def registerPlayer(name):
     """
     db = connect()
     c = db.cursor()
-    c.execute("INSERT INTO players(name,matches,winned,bye) VALUES(%s,0,0,0)", (name,))
+    c.execute("INSERT INTO players(name,matches,winned,bye) \
+                    VALUES(%s,0,0,0)", (name,))
     db.commit()
     db.close()
 
@@ -74,7 +74,8 @@ def playerStandings():
     """
     db = connect()
     c = db.cursor()
-    c.execute("SELECT id, name, winned, matches FROM players ORDER BY winned DESC")
+    c.execute("SELECT id, name, winned, matches \
+                    FROM players ORDER BY winned DESC")
     standings = c.fetchall()
     db.close()
     return standings;
@@ -89,12 +90,15 @@ def reportMatch(winner, loser):
     """
     db = connect()
     c = db.cursor()
-    c.execute("UPDATE players SET winned = winned+1, matches = matches+1 WHERE id = %s", (winner,))
+    c.execute("UPDATE players SET winned = winned+1, matches = matches+1 \
+                    WHERE id = %s", (winner,))
     db.commit()
     c.execute("UPDATE players SET matches = matches+1 WHERE id = %s", (loser,))
     db.commit()
-    c.execute("UPDATE matches SET winner = %s WHERE (id1 = %s AND id2 = %s) \
-                OR (id1 = %s AND id2 = %s) ", (winner, winner, loser,loser, winner,))
+    c.execute("UPDATE matches SET winner = %s \
+                    WHERE (id1 = %s AND id2 = %s) \
+                    OR (id1 = %s AND id2 = %s) ", \
+                    (winner, winner, loser,loser, winner,))
     db.commit()
     db.close()
 
@@ -102,7 +106,7 @@ def reportMatch(winner, loser):
 
 def not_in(pair_to_test, pairs, debug_level):
     """
-    checks if the pair to test is into pairs array.
+    checks if pair_to _test is into pairs array.
     return  True if not in
             False if in
     """
@@ -153,10 +157,10 @@ def swissPairings(debug_level=0):
     players = c.fetchall()
     db.close()
 
-    #check the number of players for even or odd
+    # check the number of players for even or odd
     # if odd: take the last player and assign him/her a "bye" flag and 
-    # give a "free win" 
-    # 
+    # assign a "free win" and pop it from the list of candidates to
+    # pairing
     if len(players) % 2:
         if debug_level>1:
             print '   odd players'
@@ -167,8 +171,8 @@ def swissPairings(debug_level=0):
                 players.pop()
                 db = connect()
                 c = db.cursor()
-                c.execute("UPDATE players SET winned = winned+1, bye = 1 WHERE id = %s",
-                             (player[0],))
+                c.execute("UPDATE players SET winned = winned+1, bye = 1 \
+                                WHERE id = %s", (player[0],))
                 db.commit() 
                 db.close()
                 break
@@ -176,11 +180,16 @@ def swissPairings(debug_level=0):
         if debug_level>1:
             print '   even players'
 
-    pairs = []
-
     # generates all the possible combinations 
     groups = combinations(players,2)
     
+    # this piece of code is the core of the pairing system, it takes the 
+    # combinations and check against the matches table, 
+    # if it is not into that table check if any player in the combination
+    # have been used in other precedent pair
+    # once the new pair passes that two filters will be inserted 
+    # into the pairs list and matches DB table.
+    pairs = []
     for group in groups:
         pair_to_test = (group[0][0], group[0][1],  group[1][0], group[1][1])
         if debug_level>1:
