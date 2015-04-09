@@ -26,7 +26,7 @@ In debug mode (1 or 2) the system ask for the number of players in the
 tournament, enter the number, hit `<enter>`, and hit `<enter>` again in every round.
 The output in debug mode 1 is something like this:
 ```
-python tournament_test.py 
+$ python tournament_test.py 
 1. Old matches can be deleted.
 2. Player records can be deleted.
 3. After deleting, countPlayers() returns zero.
@@ -85,4 +85,5 @@ SELECT * FROM view_standings;
 reached the needed number of rounds to get a champion, tournament ended successfully! 
 9. A complete tournament ended successfully!.
 Success!  All tests pass!
+$ 
 ```
