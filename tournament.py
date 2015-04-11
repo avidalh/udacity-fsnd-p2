@@ -53,7 +53,7 @@ def registerPlayer(name):
     """
     db = connect()
     c = db.cursor()
-    c.execute("INSERT INTO players(name,matches,won,bye) \
+    c.execute("INSERT INTO players(name,matches,wins,bye) \
                     VALUES(%s,0,0,0)", (name,))
     db.commit()
     db.close()
@@ -74,8 +74,8 @@ def playerStandings():
     """
     db = connect()
     c = db.cursor()
-    c.execute("SELECT id, name, won, matches \
-                    FROM players ORDER BY won DESC")
+    c.execute("SELECT id, name, wins, matches \
+                    FROM players ORDER BY wins DESC")
     standings = c.fetchall()
     db.close()
     return standings;
@@ -90,7 +90,7 @@ def reportMatch(winner, loser):
     """
     db = connect()
     c = db.cursor()
-    c.execute("UPDATE players SET won = won+1, matches = matches+1 \
+    c.execute("UPDATE players SET wins = wins+1, matches = matches+1 \
                     WHERE id = %s", (winner,))
     db.commit()
     c.execute("UPDATE players SET matches = matches+1 WHERE id = %s", (loser,))
@@ -171,7 +171,7 @@ def swissPairings(debug_level=0):
                 players.pop()
                 db = connect()
                 c = db.cursor()
-                c.execute("UPDATE players SET won = won+1, bye = 1 \
+                c.execute("UPDATE players SET wins = wins+1, bye = 1 \
                                 WHERE id = %s", (player[0],))
                 db.commit() 
                 db.close()

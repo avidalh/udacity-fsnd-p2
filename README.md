@@ -39,51 +39,7 @@ Tournament simulation
 Enter number of players:  3
 Players:
 SELECT * FROM view_standings ORDER BY id;
-+----+----------+---------+-----+------+-----+
-| id | name     | matches | won | lost | bye |
-+----+----------+---------+-----+------+-----+
-| 36 | Player_1 |       0 |   0 |    0 |   0 |
-| 37 | Player_2 |       0 |   0 |    0 |   0 |
-| 38 | Player_3 |       0 |   0 |    0 |   0 |
-+----+----------+---------+-----+------+-----+
-execution paused, press <ENTER> 
-max_rounds:  2
-pairing / round 1 results
-SELECT * FROM view_matches;
-+-----+----------+-----+----------+-----------+
-| id1 | player1  | id2 |  player2 | winner id |
-+-----+----------+-----+----------+-----------+
-|  36 | Player_1 |  37 | Player_2 |        36 |
-+-----+----------+-----+----------+-----------+
-round 1 standings
-SELECT * FROM view_standings;
-+----+----------+---------+-----+------+-----+
-| id | name     | matches | won | lost | bye |
-+----+----------+---------+-----+------+-----+
-| 38 | Player_3 |       0 |   1 |    0 |   1 |
-| 36 | Player_1 |       1 |   1 |    0 |   0 |
-| 37 | Player_2 |       1 |   0 |    1 |   0 |
-+----+----------+---------+-----+------+-----+
-execution paused, press <ENTER> 
-pairing / round 2 results
-SELECT * FROM view_matches;
-+-----+----------+-----+----------+-----------+
-| id1 | player1  | id2 |  player2 | winner id |
-+-----+----------+-----+----------+-----------+
-|  36 | Player_1 |  37 | Player_2 |        36 |
-|  38 | Player_3 |  36 | Player_1 |        38 |
-+-----+----------+-----+----------+-----------+
-round 2 standings
-SELECT * FROM view_standings;
-+----+----------+---------+-----+------+-----+
-| id | name     | matches | won | lost | bye |
-+----+----------+---------+-----+------+-----+
-| 38 | Player_3 |       1 |   2 |    0 |   1 |
-| 37 | Player_2 |       1 |   1 |    1 |   1 |
-| 36 | Player_1 |       2 |   1 |    1 |   0 |
-+----+----------+---------+-----+------+-----+
-reached the needed number of rounds to get a champion, tournament ended successfully! 
-9. A complete tournament ended successfully!.
-Success!  All tests pass!
-$ 
+...
+
+
 ```

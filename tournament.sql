@@ -21,7 +21,7 @@ CREATE TABLE players(
 	id serial PRIMARY KEY,
 	name text,						-- player's name
 	matches int,					-- matches played
-	won int,						-- matches won
+	wins int,						-- matches wins
 	bye int							--used in tournaments with odd players
 	);
 
@@ -36,11 +36,11 @@ CREATE TABLE matches(
 
 
 -- some usefull views
--- view the standings sorted by matches won
+-- view the standings sorted by matches wins
 CREATE VIEW view_standings AS
-	SELECT id, name, matches, won, matches+bye-won as lost, bye 
+	SELECT id, name, matches, wins, matches+bye-wins as "losses", bye 
 		FROM players 
-		ORDER BY won DESC;
+		ORDER BY wins DESC;
 
 
 -- view the matches with player's name and winner 
