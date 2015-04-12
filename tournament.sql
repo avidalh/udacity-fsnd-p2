@@ -54,3 +54,53 @@ CREATE VIEW view_matches AS
 			JOIN players as p1 on p1.id = matches.id1
 			JOIN players as p2 on p2.id = matches.id2;
 
+
+
+CREATE VIEW view_standings_omw AS
+	select op.id, op.name, op.matches, op.wins, sum(pl.wins) as omw, op.matches + op.bye - op.wins as losses, op.bye
+		from (
+			select players.id, players.name, players.matches, players.wins, players.bye, matches.id2 as id_opp 
+				from matches, players
+					where matches.id1 = players.id 
+				UNION 
+			select players.id, players.name, players.matches, players.wins, players.bye, matches.id1 as id_opp 
+				from players, matches 
+					where matches.id2 = players.id ) as op
+		left join players as pl 
+			on op.id_opp = pl.id 
+		group by op.id, op.name, op.matches, op.wins, op.bye, pl.bye
+		ORDER by
+			wins DESC, omw DESC;
+
+
+
+-- select op.id, op.name, op.matches, op.wins, sum(pl.wins) as omw, op.matches + op.bye - op.wins as losses, op.bye
+-- from (
+-- select players.id, players.name, players.matches, players.wins, players.bye, matches.id2 as id_opp 
+-- from matches, players
+-- where matches.id1 = players.id 
+-- UNION 
+-- select players.id, players.name, players.matches, players.wins, players.bye, matches.id1 as id_opp 
+-- from players, matches 
+-- where matches.id2 = players.id ) as op
+-- left join players as pl 
+-- on op.id_opp = pl.id 
+-- group by op.id, op.name, op.matches, op.wins, op.bye
+-- ORDER by
+-- wins DESC, omw DESC;
+
+-- select op.id, op.name, op.matches, op.wins, sum(pl.wins)-pl.bye as omw, op.matches + op.bye - op.wins as losses, op.bye
+-- from (
+-- select players.id, players.name, players.matches, players.wins, players.bye, matches.id2 as id_opp 
+-- from matches, players
+-- where matches.id1 = players.id 
+-- UNION 
+-- select players.id, players.name, players.matches, players.wins, players.bye, matches.id1 as id_opp 
+-- from players, matches 
+-- where matches.id2 = players.id ) as op
+-- left join players as pl 
+-- on op.id_opp = pl.id 
+-- group by op.id, op.name, op.matches, op.wins, op.bye
+-- ORDER by
+-- wins DESC, omw DESC;
+

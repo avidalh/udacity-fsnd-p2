@@ -5,6 +5,7 @@
 from tournament import *
 from prettytable import PrettyTable
 from math import log, ceil
+import random
 
 def testDeleteMatches():
     deleteMatches()
@@ -210,7 +211,10 @@ def testPairingsAdvanced(debug_level=0):
 
         # and use it to report the matches results
         for pair in pairs:
-            reportMatch(pair[0], pair[1])
+            if bool(random.getrandbits(1)):
+                reportMatch(pair[0], pair[1])
+            else:
+                reportMatch(pair[1], pair[0])
 
         # debugging info
         if debug_level:
