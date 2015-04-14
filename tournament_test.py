@@ -270,8 +270,9 @@ def testPairingsAdvanced(debug_level=0, ):
                 print 'execution paused, press <ENTER>',
                 raw_input()
     if debug_level:
-        print('All Tournaments and Players final rank:')
+        print('\nFINAL RANKINGS:')
         for tournament in range(tournaments_number):
+            print '\nTournament %d results:' % tournament
             print_query("SELECT * FROM final_score WHERE tid = %s;" % tournament)
     print "9. A complete simulation for all tournaments ended successfully!."
 
