@@ -36,13 +36,13 @@ def countPlayers():
     """Returns the number of players currently registered."""
     db = connect()
     c = db.cursor()
-    c.execute("SELECT count(id)from players")
+    c.execute("SELECT count(pid)from players")
     count = c.fetchone()
     db.close()
     return count[0];
 
 
-def registerPlayer(name):
+def registerPlayer(name, tid = 0):
     """Adds a player to the tournament database.
   
     The database assigns a unique serial id number for the player.  (This
@@ -53,13 +53,13 @@ def registerPlayer(name):
     """
     db = connect()
     c = db.cursor()
-    c.execute("INSERT INTO players(name,matches,wins,bye) \
-                    VALUES(%s,0,0,0)", (name,))
+    c.execute("INSERT INTO players(tid, name, matches, wins, draws, bye) \
+                    VALUES(%s,%s,0,0,0,0)", (tid, name,))
     db.commit()
     db.close()
 
 
-def playerStandings():
+def playerStandings(tid=0):
     """Returns a list of the players and their win records, sorted by wins.
 
     The first entry in the list should be the player in first place, or a player
@@ -74,33 +74,50 @@ def playerStandings():
     """
     db = connect()
     c = db.cursor()
-    c.execute("SELECT id, name, wins, matches \
-                    FROM players ORDER BY wins DESC")
+    c.execute("SELECT pid, name, wins, matches \
+                    FROM players WHERE tid=%s ORDER BY wins DESC", (tid,))
     standings = c.fetchall()
     db.close()
     return standings;
 
 
-def reportMatch(winner, loser):
+def reportMatch(winner, loser, draw=0):
     """Records the outcome of a single match between two players.
 
     Args:
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-    db = connect()
-    c = db.cursor()
-    c.execute("UPDATE players SET wins = wins+1, matches = matches+1 \
-                    WHERE id = %s", (winner,))
-    db.commit()
-    c.execute("UPDATE players SET matches = matches+1 WHERE id = %s", (loser,))
-    db.commit()
-    c.execute("UPDATE matches SET winner = %s \
-                    WHERE (id1 = %s AND id2 = %s) \
-                    OR (id1 = %s AND id2 = %s) ", \
-                    (winner, winner, loser,loser, winner,))
-    db.commit()
-    db.close()
+    if not draw:
+        db = connect()
+        c = db.cursor()
+        c.execute("UPDATE players SET wins = wins+1, matches = matches+1 \
+                        WHERE pid = %s", (winner,))
+        db.commit()
+        c.execute("UPDATE players SET matches = matches+1 WHERE pid = %s", (loser,))
+        db.commit()
+        c.execute("UPDATE matches SET winner = %s \
+                        WHERE (pid1 = %s AND pid2 = %s) \
+                        OR (pid1 = %s AND pid2 = %s) ", \
+                        (winner, winner, loser,loser, winner,))
+        db.commit()
+        db.close()
+    else:
+        db = connect()
+        c = db.cursor()
+        c.execute("UPDATE players SET draws = draws+1, matches = matches+1 \
+                        WHERE pid = %s or pid = %s", (winner,loser,))
+        db.commit()
+        # c.execute("UPDATE players SET matches = matches+1 WHERE id = %s", (loser,))
+        db.commit()
+        c.execute("UPDATE matches SET winner = 0 \
+                        WHERE (pid1 = %s AND pid2 = %s) \
+                        OR (pid1 = %s AND pid2 = %s) ", \
+                        (winner, loser,loser, winner,))
+        db.commit()
+        db.close()
+
+
 
 
 
@@ -122,7 +139,7 @@ def not_in(pair_to_test, pairs, debug_level):
     return True
 
 
-def swissPairings(debug_level=0):
+def swissPairings(debug_level=0, tid=0):
     """Returns a list of pairs of players for the next round of a match.
   
     Assuming that there are an even number of players registered, each player
@@ -142,7 +159,7 @@ def swissPairings(debug_level=0):
     # by means of a SQL view
     db = connect()
     c = db.cursor()
-    c.execute("SELECT id1, player1, id2, player2 FROM view_matches")
+    c.execute("SELECT pid1, player1, pid2, player2 FROM view_matches")
     matches = c.fetchall()
     db.close()
     
@@ -153,10 +170,9 @@ def swissPairings(debug_level=0):
     # here is used another SQL view
     db = connect()
     c = db.cursor()
-    c.execute("SELECT id, name, bye FROM view_standings")
+    c.execute("SELECT pid, name, bye FROM standings where tid =%s",(tid,))
     players = c.fetchall()
-    db.close()
-
+    
     # check the number of players for even or odd
     # if odd: take the last player and assign him/her a "bye" flag and 
     # assign a "free win" and pop it from the list of candidates to
@@ -171,8 +187,8 @@ def swissPairings(debug_level=0):
                 players.pop()
                 db = connect()
                 c = db.cursor()
-                c.execute("UPDATE players SET wins = wins+1, bye = 1 \
-                                WHERE id = %s", (player[0],))
+                c.execute("UPDATE players SET bye = 1 \
+                                WHERE pid = %s", (player[0],))
                 db.commit() 
                 db.close()
                 break
@@ -205,7 +221,7 @@ def swissPairings(debug_level=0):
                 pairs.append((group[0][0], group[0][1], group[1][0], group[1][1]))
                 db = connect()
                 c = db.cursor()
-                c.execute("INSERT INTO matches(id1,id2) VALUES(%s,%s)", (group[0][0], group[1][0],))
+                c.execute("INSERT INTO matches(pid1,pid2) VALUES(%s,%s)", (group[0][0], group[1][0],))
                 db.commit() 
                 db.close()
             else:

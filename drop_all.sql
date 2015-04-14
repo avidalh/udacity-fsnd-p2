@@ -1,8 +1,9 @@
 -- This file is for DELETE all views, tables and database
 -- USE WITH CAREFULL!
 
-DROP VIEW view_standings;
+DROP VIEW standings;
 DROP VIEW view_matches;
+DROP VIEW final_score;
 
 DROP TABLE matches;
 DROP TABLE players;

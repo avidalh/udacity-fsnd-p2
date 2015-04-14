@@ -3,11 +3,11 @@
 -- Put your SQL 'create table' statements in this file; also 'create view'
 -- statements if you choose to use it.
 --
--- You can write comments in this file by starting them with two dashes, like
+-- You can write comments in this file by starting them with two dAShes, like
 -- these lines here.
 
 
--- First of all create the database
+-- First of all create the databASe
 CREATE DATABASE tournament;
 
 
@@ -18,89 +18,111 @@ CREATE DATABASE tournament;
 
 -- Players table, used to store player's information
 CREATE TABLE players(
-	id serial PRIMARY KEY,
+	tid int,						-- tournament number
+	pid serial,						-- player ID
 	name text,						-- player's name
 	matches int,					-- matches played
 	wins int,						-- matches wins
-	bye int							--used in tournaments with odd players
+	draws int,						-- matches draws
+	bye int,						-- used in tournaments with odd players
+	PRIMARY KEY (pid)
 	);
 
 
 -- matches table, used for store pairings and results of every match
 CREATE TABLE matches(					
-	id1 int REFERENCES players(id), --player 1 in the match
-	id2 int REFERENCES players(id), --player 2 in the match
-	winner int,						--match winner
-	PRIMARY KEY (id1, id2)			--primary key player's id.
+	pid1 int REFERENCES players(pid), 	-- player 1 in the match
+	pid2 int REFERENCES players(pid), 	-- player 2 in the match
+	winner int,							-- match winner
+	PRIMARY KEY (pid1, pid2)			-- primary key player's id.
 	);
 
 
--- some usefull views
--- view the standings sorted by matches wins
-CREATE VIEW view_standings AS
-	SELECT id, name, matches, wins, matches+bye-wins as "losses", bye 
+-- some usefull views:
+
+-- view the standings sorted by score
+-- the weights for wins, draws and losses are 2, 1 and 0 resp.
+-- a bye counts like a win
+CREATE VIEW standings AS
+	SELECT 	tid, 
+			pid, 
+			name, 
+			matches, 
+			bye, 
+			wins, 
+			draws, 
+			matches-(wins+draws) AS losses, 
+			wins *2 + draws *1 + bye *2 AS score
 		FROM players 
-		ORDER BY wins DESC;
+			ORDER BY tid, 
+					 score DESC, 
+					 wins DESC;
+
+
+-- view the final list of players score with OMW calculation
+-- per tournament
+-- it's a bit complex view compounds by one UNION and a JOIN and some math.
+-- the weights for wins, draws and losses are the same above
+CREATE VIEW final_score AS
+	SELECT 	pl.tid,
+			pl.pid, 
+			pl.name, 
+			pl.matches, 
+			pl.bye,
+			pl.wins, 
+			pl.draws, 
+			pl.matches-(pl.wins+pl.draws) AS losses,
+			ROUND((SUM(op.wins*0.5 + 0.0) / (pl.matches+0.0)), 2) AS omw,
+			ROUND(((pl.wins *2 + pl.draws *1 + pl.bye *2) + (SUM(op.wins *0.5 +0.0) / 
+				(pl.matches+0.0))), 2) AS score
+		FROM (
+			SELECT 	players.tid,
+					players.pid, 
+					players.name, 
+					players.matches, 
+					players.wins, 
+					players.draws, 
+					players.bye, 
+					matches.pid1 AS opp 
+				FROM players, matches 
+					WHERE matches.pid2 = players.pid
+			UNION
+			SELECT 	players.tid,
+					players.pid, 
+					players.name, 
+					players.matches, 
+					players.wins, 
+					players.draws, 
+					players.bye, 
+					matches.pid2 AS opp 
+				FROM players, matches 
+					WHERE matches.pid1 = players.pid
+			) AS pl
+		LEFT JOIN players AS op
+			ON pl.opp = op.pid
+		GROUP BY pl.tid,
+				 pl.pid,
+				 pl.name,
+				 pl.matches,
+				 pl.wins,
+				 pl.draws,
+				 pl.bye
+		ORDER BY tid, 
+				 score DESC, 
+				 wins DESC;
 
 
 -- view the matches with player's name and winner 
 CREATE VIEW view_matches AS
-	SELECT p1.id AS "id1", 
-		   p1.name AS "player1", 
-		   p2.id AS "id2", 
-		   p2.name AS "player2", 
-		   matches.winner AS "winner id" 
+	SELECT 	p1.tid AS "tid",	
+			p1.pid AS "pid1", 
+			p1.name AS "player1", 
+			p2.pid AS "pid2", 
+			p2.name AS "player2", 
+			matches.winner AS "winner" 
 		FROM matches
-			JOIN players as p1 on p1.id = matches.id1
-			JOIN players as p2 on p2.id = matches.id2;
-
-
-
-CREATE VIEW view_standings_omw AS
-	select op.id, op.name, op.matches, op.wins, sum(pl.wins) as omw, op.matches + op.bye - op.wins as losses, op.bye
-		from (
-			select players.id, players.name, players.matches, players.wins, players.bye, matches.id2 as id_opp 
-				from matches, players
-					where matches.id1 = players.id 
-				UNION 
-			select players.id, players.name, players.matches, players.wins, players.bye, matches.id1 as id_opp 
-				from players, matches 
-					where matches.id2 = players.id ) as op
-		left join players as pl 
-			on op.id_opp = pl.id 
-		group by op.id, op.name, op.matches, op.wins, op.bye, pl.bye
-		ORDER by
-			wins DESC, omw DESC;
-
-
-
--- select op.id, op.name, op.matches, op.wins, sum(pl.wins) as omw, op.matches + op.bye - op.wins as losses, op.bye
--- from (
--- select players.id, players.name, players.matches, players.wins, players.bye, matches.id2 as id_opp 
--- from matches, players
--- where matches.id1 = players.id 
--- UNION 
--- select players.id, players.name, players.matches, players.wins, players.bye, matches.id1 as id_opp 
--- from players, matches 
--- where matches.id2 = players.id ) as op
--- left join players as pl 
--- on op.id_opp = pl.id 
--- group by op.id, op.name, op.matches, op.wins, op.bye
--- ORDER by
--- wins DESC, omw DESC;
-
--- select op.id, op.name, op.matches, op.wins, sum(pl.wins)-pl.bye as omw, op.matches + op.bye - op.wins as losses, op.bye
--- from (
--- select players.id, players.name, players.matches, players.wins, players.bye, matches.id2 as id_opp 
--- from matches, players
--- where matches.id1 = players.id 
--- UNION 
--- select players.id, players.name, players.matches, players.wins, players.bye, matches.id1 as id_opp 
--- from players, matches 
--- where matches.id2 = players.id ) as op
--- left join players as pl 
--- on op.id_opp = pl.id 
--- group by op.id, op.name, op.matches, op.wins, op.bye
--- ORDER by
--- wins DESC, omw DESC;
+			JOIN players AS p1 
+				ON p1.pid = matches.pid1
+			JOIN players AS p2 
+				ON p2.pid = matches.pid2;
 

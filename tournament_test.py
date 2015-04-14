@@ -5,7 +5,7 @@
 from tournament import *
 from prettytable import PrettyTable
 from math import log, ceil
-import random
+from random import getrandbits, choice
 
 def testDeleteMatches():
     deleteMatches()
@@ -148,95 +148,132 @@ def print_query(query):
     print y
 
 
-def testPairingsAdvanced(debug_level=0):
+def testPairingsAdvanced(debug_level=0, ):
     """
-    advanced test to check a complete tournament.
-    enter the number of players (even or odd) and the function simulates 
-    the tournament rounds setting a winner/loser in each match.
-    To view the output info set debug_level to 1 or 2 in the source code. 
+    advanced test to check whole tournaments.
+    enter the number of tournaments and players (even or odd) and the function
+    simulates the tournaments rounds setting random winner/loser/draw in each
+    match. 
+    To view the output info set debug_level to 1 or 2 in the function call at 
+    the end of the source code. 
     In each round the standings and matches table are displayed.
+    Finally the final score is displayed for each tournament.
     """
     deleteMatches()
     deletePlayers()    
     
-    # in debug mode ask for the number of players, if normal mode uses 8
-    # players must be more than one...
+    # in debug mode ask for the number of players, if normal mode uses 8 players and 2 tournaments
+    # players must be more than one and tournaments must be more than zero...
     if debug_level:
         print "Tournament simulation"
-        print "Enter number of players: ",
-        players_number = 0
+        print "Enter number of tournaments: ",
+        tournaments_number = 0
         while True:
-            players_number = raw_input()
-            try: 
-                if int(players_number) >1:
+            try:
+                tournaments_number = int(raw_input())
+                if tournaments_number >0:
                     break
             except:
                 pass
-            print "Enter number of players (must be more than one!): ",
+            print "Enter number of tournaments (must be more than zero!): ",
+
+        players_number = []
+        for t in range(tournaments_number):
+            print "Tournament number %d" % t
+            print "Enter number of players: ",
+            
+            while True:
+                try: 
+                    number = (int(raw_input()))
+                    if number >1:
+                        players_number.append(number)
+                        for i in range(number):
+                            registerPlayer('Player_%d' % i, t)
+                        break
+                except:
+                    pass
+                print "Enter number of players (must be more than one!): ",
+                        
+                
     else: 
-        players_number = 8
+        players_number = [2,5,3]
+        tournaments_number = 3
 
     # create players names and insert them into DB 
-    for i in range(int(players_number)):
-        registerPlayer('Player_%d' % (i+1))
+        for tournament in range(int(tournaments_number)):
+            for i in range(players_number[tournament]):
+                registerPlayer('Player_%d' % i, tournament)
 
     # in debug mode shows the generated list of players
+
+    # print players_number
+
     if debug_level:
         print 'Players:'
-        print_query("SELECT * FROM view_standings ORDER BY id;")
+        print_query("SELECT * FROM standings ORDER BY tid, pid;")
         print 'execution paused, press <ENTER>',
         raw_input()
 
-    # calculate the number of rounds in the tournament
-    # max rounds will be the upper nearest int of log(base2)(players number)
-    max_rounds = int(ceil(log(int(players_number), 2)))
-    if debug_level:
-        print 'max_rounds: ', max_rounds
-    rnd = 0
-    
-    # looping until tournament ends...
-    while True:
-        rnd += 1
-        pairs = []
-
-        # call the function to pairing the players
-        pairings =  swissPairings(debug_level)
+    for tournament in range(tournaments_number):
+        # calculate the number of rounds in the tournament
+        # max rounds will be the upper nearest int of log(base2)(players number)
+        max_rounds = int(ceil(log(players_number[tournament], 2)))
+        if debug_level:
+            print 'tournament %d' % tournament
+            print 'max_rounds: ', max_rounds
+        rnd = 0
         
-        if debug_level > 1:
-            print 'pairings: ', pairings
+        # looping until tournament ends...
+        
+        while True:
+            rnd += 1
+            pairs = []
 
-        # create a pairs list with only the players ID
-        for pair in pairings:
-            pairs.append((pair[0], pair[2]))
+            # call the function to pairing the players
+            pairings =  swissPairings(debug_level,tournament)
+            
+            if debug_level > 1:
+                print 'pairings: ', pairings
 
-        # and use it to report the matches results
-        for pair in pairs:
-            if bool(random.getrandbits(1)):
-                reportMatch(pair[0], pair[1])
-            else:
-                reportMatch(pair[1], pair[0])
+            # create a pairs list with only the players ID
+            for pair in pairings:
+                pairs.append((pair[0], pair[2]))
 
-        # debugging info
-        if debug_level:
-            print 'pairing / round %s results' % rnd
-            print_query("SELECT * FROM view_matches;")
-        if debug_level:
-            print('round %d standings' % rnd)
-            print_query("SELECT * FROM view_standings;")
+            # and use it to report the matches results
+            for pair in pairs:
+                if choice([0,1,2]) == 0:
+                    reportMatch(pair[0], pair[1], 1)
+                else:
+                    if bool(getrandbits(2)):
+                        reportMatch(pair[0], pair[1])
+                    else:
+                        reportMatch(pair[1], pair[0])
+            # debugging info
+            if debug_level:
+                print 'pairing / round %s results' % rnd
+                print_query("SELECT * FROM view_matches WHERE tid = %s;" % tournament)
+            if debug_level:
+                print('tournament %d round %d standings' % (tournament, rnd))
+                print_query("SELECT * FROM standings WHERE tid = %s;" % tournament)
 
-        # if rounds exhausted the tournament ends
-        if rnd == max_rounds:
+            # if rounds exhausted the tournament ends
+            if rnd == max_rounds:
+                if debug_level: 
+                    print "reached the needed number of rounds to get a champion," \
+                          " tournament %s ended!" % t
+                    print 'execution paused, press <ENTER>',
+                    raw_input()
+                break
+
+            # pause to evaluate the debug info in each round
             if debug_level: 
-                print "reached the needed number of rounds to get a champion," \
-                      " tournament ended successfully! "
-            print "9. A complete tournament ended successfully!."
-            break
-
-        # pause to evaluate the debug info in each round
-        if debug_level: 
-            print 'execution paused, press <ENTER>',
-            raw_input()
-
+                print 'execution paused, press <ENTER>',
+                raw_input()
+    if debug_level:
+        print('All Tournaments and Players final rank:')
+        for tournament in range(tournaments_number):
+            print_query("SELECT * FROM final_score WHERE tid = %s;" % tournament)
+    print "9. A complete simulation for all tournaments ended successfully!."
 
 if __name__ == '__main__':
     testDeleteMatches()
