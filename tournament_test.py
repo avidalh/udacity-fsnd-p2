@@ -199,7 +199,7 @@ def testPairingsAdvanced(debug_level=0):
                     pass
                 print "Enter number of players (must be more than one!): ",
                         
-                
+    # if no debug mode simulate three tournaments of 2, 5 and 3 players      
     else: 
         players_number = [2,5,3]
         tournaments_number = 3

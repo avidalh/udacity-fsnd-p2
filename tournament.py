@@ -189,7 +189,8 @@ def swissPairings(debug_level=0, tid=0):
     if debug_level>1: 
         print '   matches: ', matches  
     
-    # now read the list of players sorted by rank descending
+    # now read the list of players sorted by rank descending in order to acomplish
+    # with the swiss system pairing palyers with the same or near the same rank.
     # here is used the SQL view standings
     db = connect()
     c = db.cursor()
@@ -197,13 +198,12 @@ def swissPairings(debug_level=0, tid=0):
     players = c.fetchall()
     
     # check the number of players for even or odd
-    # if odd: take the last player and assign him/her a "bye" flag and 
+    # if odd: take a player (with no bye) and assign him/her a "bye" flag and 
     # assign a "free win" and pop it from the list of candidates to
     # pairing
     if len(players) % 2:
         if debug_level>1:
             print '   odd players'
-        #for player in reversed(players):
         for player in players:
             if player[2] == 0: 
                 if debug_level>1:
@@ -225,10 +225,11 @@ def swissPairings(debug_level=0, tid=0):
     
     # this piece of code is the core of the pairing system, it takes the 
     # combinations and check against the matches table, 
-    # if it is not into that table check if any player in the combination
+    # if it is not into that table: check if any player in the combination
     # have been used in other precedent pair
     # once the new pair passes that two filters will be inserted 
     # into the pairs list and matches DB table.
+    # 
     pairs = []
     for group in groups:
         pair_to_test = (group[0][0], group[0][1],  group[1][0], group[1][1])
