@@ -124,5 +124,7 @@ CREATE VIEW view_matches AS
 			JOIN players AS p1 
 				ON p1.pid = matches.pid1
 			JOIN players AS p2 
-				ON p2.pid = matches.pid2;
+				ON p2.pid = matches.pid2
+		ORDER BY tid,
+				 pid1;
 
