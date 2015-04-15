@@ -4,7 +4,11 @@
 
 from tournament import *
 from prettytable import PrettyTable
+
+# to calculate the number of rounds
 from math import log, ceil
+
+# to simulate random wins, losses or draws in the matches
 from random import getrandbits, choice
 
 def testDeleteMatches():
@@ -130,7 +134,8 @@ def testPairings():
 
 def print_query(query):
     """
-    print the query array in the psql way to easy view of the database tables
+    print the query array in the "psql way" to easy views of database tables
+    without log in psql environment
     """
     db = connect()
     c = db.cursor()
@@ -148,7 +153,7 @@ def print_query(query):
     print y
 
 
-def testPairingsAdvanced(debug_level=0, ):
+def testPairingsAdvanced(debug_level=0):
     """
     advanced test to check whole tournaments.
     enter the number of tournaments and players (even or odd) and the function
@@ -165,7 +170,7 @@ def testPairingsAdvanced(debug_level=0, ):
     # in debug mode ask for the number of players, if normal mode uses 8 players and 2 tournaments
     # players must be more than one and tournaments must be more than zero...
     if debug_level:
-        print "Tournament simulation"
+        print "Tournaments simulation"
         print "Enter number of tournaments: ",
         tournaments_number = 0
         while True:

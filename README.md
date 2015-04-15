@@ -19,14 +19,15 @@ The functions have support for:
 
 The ranking system I've adopted is the following:
 * win: 2 points (2x)
-* bye: 2 points (2x) (maximum one per player)
+* bye: 2 points (2x) (maximum one bye per player)
 * draw: 1 point (1x)
 * lose: 0 points (0x)
 * OMW: sum of opponents wins times 1/2 (0.5x)
 
 All tests in `tournament_test.py` passed and the function 
 `testPairingsAdvanced()` has been added in order to recreate full 
-tournaments.
+tournaments giving a random result to every match (winner1, winner2 or draw with 1/3 probability for each result)
+Sometimes many matches draws and so tied rankings may appear even using the OMW system...
 
 `testPairingsAdvanced(debug_level)` has three possible debugging levels:
 * `testPairingsAdvanced()`: no debug info, this is the default option (mute mode).
@@ -46,7 +47,7 @@ vagrant@vagrant-ubuntu-trusty-32:/vagrant/fsnd/p2-tournament$ python tournament_
 6. Newly registered players appear in the standings with no matches.
 7. After a match, players have updated standings.
 8. After one match, players with one win are paired.
-Tournament simulation
+Tournaments simulation
 Enter number of tournaments:  2
 Tournament number 0
 Enter number of players:  3

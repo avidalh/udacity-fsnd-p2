@@ -62,7 +62,7 @@ CREATE VIEW standings AS
 -- view the final list of players score with OMW calculation
 -- per tournament
 -- it's a bit complex view compounds by one UNION and a JOIN and some math.
--- the weights for wins, draws and losses are the same above
+-- the weights for wins, draws and losses are the same above and OMW has 0.5x
 CREATE VIEW final_score AS
 	SELECT 	pl.tid,
 			pl.pid, 

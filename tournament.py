@@ -50,6 +50,10 @@ def registerPlayer(name, tid = 0):
   
     Args:
       name: the player's full name (need not be unique).
+
+    Extra: the function has 'tid' as a new parameter with a default value = 0. 
+    this option allows the function be used as anterior version and provide
+    support for more than one tournaments at same time.
     """
     db = connect()
     c = db.cursor()
@@ -71,6 +75,10 @@ def playerStandings(tid=0):
         name: the player's full name (as registered)
         wins: the number of matches the player has won
         matches: the number of matches the player has played
+
+    Extra: the function has 'tid' as a new parameter with a default value = 0. 
+    this option allows the function be used as anterior version and provide
+    support for more than one tournaments at same time.
     """
     db = connect()
     c = db.cursor()
@@ -87,6 +95,13 @@ def reportMatch(winner, loser, draw=0):
     Args:
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
+     
+      draw: in tied matches draw=1 and the winner field in database is updated
+      to value 0.
+    
+    Extra: the function has 'draw' as a new parameter with a default value = 0. 
+    this option allows the function be used as anterior version and provide
+    support for tied matches.
     """
     if not draw:
         db = connect()
@@ -124,8 +139,9 @@ def reportMatch(winner, loser, draw=0):
 def not_in(pair_to_test, pairs, debug_level):
     """
     checks if pair_to _test is into pairs array.
-    return  True if not in
-            False if in
+    Returns: 
+        True if not in
+        False if in
     """
     if debug_level>1:
         print '     pair_to_test: ', pair_to_test
@@ -153,10 +169,17 @@ def swissPairings(debug_level=0, tid=0):
         name1: the first player's name
         id2: the second player's unique id
         name2: the second player's name
+
+    Extra: 
+        - the function has 'tid' as a new parameter with a default value = 0. 
+        this option allows the function be used as anterior version and provide
+        support for more than one tournaments at same time.
+        - just for debugging parameter 'debug_level' has been added with a
+        default value of 0 for compatibility with udacity tests file.
     """
 
     # in first instance read the list of matches played (even if it is empty)
-    # by means of a SQL view
+    # by means of a SQL view 'view_matches'
     db = connect()
     c = db.cursor()
     c.execute("SELECT pid1, player1, pid2, player2 FROM view_matches")
@@ -167,7 +190,7 @@ def swissPairings(debug_level=0, tid=0):
         print '   matches: ', matches  
     
     # now read the list of players sorted by rank descending
-    # here is used another SQL view
+    # here is used the SQL view standings
     db = connect()
     c = db.cursor()
     c.execute("SELECT pid, name, bye FROM standings where tid =%s",(tid,))
@@ -180,11 +203,12 @@ def swissPairings(debug_level=0, tid=0):
     if len(players) % 2:
         if debug_level>1:
             print '   odd players'
-        for player in reversed(players):
+        #for player in reversed(players):
+        for player in players:
             if player[2] == 0: 
                 if debug_level>1:
                     print '   found player with bye = 0, poping it from the list'
-                players.pop()
+                players.pop(players.index(player))
                 db = connect()
                 c = db.cursor()
                 c.execute("UPDATE players SET bye = 1 \
