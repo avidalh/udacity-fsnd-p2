@@ -10,7 +10,7 @@ The project has these files:
 In order to use the program you should:
 1- clone the git repository
 2- use `tournament.sql`to create the database using `\i tournament.sql` command from psql environment
-3- run the program typping `python tournament_test.py` and evaluate
+3- run the program typewriting `python tournament_test.py` from the command line and evaluate
 
 The functions have support for:
 * both even and odd number of players
@@ -18,7 +18,7 @@ The functions have support for:
 * opponent match-wins ranking
 * multiple tournaments at same time
 
-I've adopted the followings weights for the final score table:
+I've adopted the following weights for the final score table:
 * win: 2 points  (2x)
 * bye: 2 points  (2x) (same as win and maximum one bye per player)
 * draw: 1 point  (1x)
@@ -36,7 +36,7 @@ Function `testPairingsAdvanced(debug_level)` in `tournament_test.py` has three p
 * `testPairingsAdvanced(1)`: debug messages level 1, before and after the functions calls.
 * `testPairingsAdvanced(2)`: debug messages level 2, idem level 1 plus information from inside functions.
 
-In debug mode (1 or 2) the system ask for the number of players in the 
+In debug mode (1 or 2) the system asks for the number of players in the 
 tournament, enter the number, hit `<enter>`, and hit `<enter>` again in every round.
 The output in debug mode 1 is something like this:
 ```
