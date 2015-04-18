@@ -190,10 +190,11 @@ def testPairingsAdvanced(debug_level=0):
             while True:
                 try: 
                     number = (int(raw_input()))
-                    if number >1:
+                    if number >1:# c.execute("INSERT INTO matches (pid1, pid2, winner) \
+        #                 VALUES (%s, %s, %s)", (winner, loser, winner,))
                         players_number.append(number)
                         for i in range(number):
-                            registerPlayer('Player_%d' % i, t)
+                            registerPlayer('Player_%d' % i, t, 'Tournament_%d' %t)
                         break
                 except:
                     pass
@@ -278,7 +279,7 @@ def testPairingsAdvanced(debug_level=0):
         print('\nFINAL RANKINGS:')
         for tournament in range(tournaments_number):
             print '\nTournament %d results:' % tournament
-            print_query("SELECT * FROM final_score WHERE tid = %s;" % tournament)
+            print_query("SELECT * FROM v_final_score WHERE tid = %s;" % tournament)
     print "9. A complete simulation for all tournaments ended successfully!."
 
 if __name__ == '__main__':

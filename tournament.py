@@ -5,8 +5,11 @@
 
 import psycopg2
 
-# used for generate pairs
+# used to generate pairs
 from itertools import combinations
+
+# used to random assigning 'bye'
+from random import choice
 
 
 def connect():
@@ -14,20 +17,22 @@ def connect():
     return psycopg2.connect("dbname=tournament")
 
 
-def deleteMatches():
+def deleteMatches(tid=0):
     """Remove all the match records from the database."""
     db = connect()
     c = db.cursor()
-    c.execute("DELETE FROM matches")
+    c.execute("SELECT * FROM delete_matches_by_tid(%s)", (tid,))
     db.commit()
     db.close()
 
 
-def deletePlayers():
+def deletePlayers(tid=0):
     """Remove all the player records from the database."""
     db = connect()
     c = db.cursor()
     c.execute("DELETE FROM players")
+    db.commit()
+    c.execute("DELETE FROM tournaments WHERE tid = %s", (tid,))
     db.commit()
     db.close()
 
@@ -42,7 +47,7 @@ def countPlayers():
     return count[0];
 
 
-def registerPlayer(name, tid = 0):
+def registerPlayer(name, tid=0, tname="tournament_0"):
     """Adds a player to the tournament database.
   
     The database assigns a unique serial id number for the player.  (This
@@ -50,24 +55,25 @@ def registerPlayer(name, tid = 0):
   
     Args:
       name: the player's full name (need not be unique).
+      tid: tournament tid
+      tname: tournament name
 
-    Extra: the function has 'tid' as a new parameter with a default value = 0. 
-    this option allows the function be used as anterior version and provide
-    support for more than one tournaments at same time.
+    Extra: the function has 'tid' and 'tname' as new parameters with default
+    values allowing be used as anterior version and provide support for 
+    more than one tournaments at same time.
     """
     db = connect()
     c = db.cursor()
-    c.execute("INSERT INTO players(tid, name, matches, wins, draws, bye) \
-                    VALUES(%s,%s,0,0,0,0)", (tid, name,))
+    c.execute("SELECT * FROM register_player(%s,%s,%s)", (name, tid, tname,))
     db.commit()
     db.close()
 
 
-def playerStandings(tid=0):
+def playerStandings(tid=0, giveme_bye=0):
     """Returns a list of the players and their win records, sorted by wins.
 
     The first entry in the list should be the player in first place, or a player
-    tied for first place if there is currently a tie.
+    tid for first place if there is currently a tie.
 
     Returns:
       A list of tuples, each of which contains (id, name, wins, matches):
@@ -76,14 +82,20 @@ def playerStandings(tid=0):
         wins: the number of matches the player has won
         matches: the number of matches the player has played
 
-    Extra: the function has 'tid' as a new parameter with a default value = 0. 
+    Extras: 
+    - the function has 'tid' as a new parameter with a default value = 0. 
     this option allows the function be used as anterior version and provide
     support for more than one tournaments at same time.
+    - the function has 'giveme_bye' as a new parameter to support odd players
     """
     db = connect()
     c = db.cursor()
-    c.execute("SELECT pid, name, wins, matches \
-                    FROM players WHERE tid=%s ORDER BY wins DESC", (tid,))
+    if not giveme_bye:
+        c.execute("SELECT pid, name, wins, matches \
+                    FROM standings WHERE tid=%s", (tid,))
+    else:
+        c.execute("SELECT pid, name, bye \
+                    FROM standings where tid =%s",(tid,))
     standings = c.fetchall()
     db.close()
     return standings;
@@ -96,44 +108,25 @@ def reportMatch(winner, loser, draw=0):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
      
-      draw: in tied matches draw=1 and the winner field in database is updated
+      draw: in tid matches draw=1 and the winner field in database is updated
       to value 0.
     
     Extra: the function has 'draw' as a new parameter with a default value = 0. 
     this option allows the function be used as anterior version and provide
-    support for tied matches.
+    support for tid matches.
     """
+    query = '''
+        SELECT * FROM report_match(%s,%s,%s);
+    '''
+    db = connect()
+    c = db.cursor()
+    
     if not draw:
-        db = connect()
-        c = db.cursor()
-        c.execute("UPDATE players SET wins = wins+1, matches = matches+1 \
-                        WHERE pid = %s", (winner,))
-        db.commit()
-        c.execute("UPDATE players SET matches = matches+1 WHERE pid = %s", (loser,))
-        db.commit()
-        c.execute("UPDATE matches SET winner = %s \
-                        WHERE (pid1 = %s AND pid2 = %s) \
-                        OR (pid1 = %s AND pid2 = %s) ", \
-                        (winner, winner, loser,loser, winner,))
-        db.commit()
-        db.close()
+        c.execute(query, (winner, loser, winner,))
     else:
-        db = connect()
-        c = db.cursor()
-        c.execute("UPDATE players SET draws = draws+1, matches = matches+1 \
-                        WHERE pid = %s or pid = %s", (winner,loser,))
-        db.commit()
-        # c.execute("UPDATE players SET matches = matches+1 WHERE id = %s", (loser,))
-        db.commit()
-        c.execute("UPDATE matches SET winner = 0 \
-                        WHERE (pid1 = %s AND pid2 = %s) \
-                        OR (pid1 = %s AND pid2 = %s) ", \
-                        (winner, loser,loser, winner,))
-        db.commit()
-        db.close()
-
-
-
+        c.execute(query, (winner, loser, 0,))
+    db.commit()
+    db.close()
 
 
 def not_in(pair_to_test, pairs, debug_level):
@@ -190,21 +183,21 @@ def swissPairings(debug_level=0, tid=0):
         print '   matches: ', matches  
     
     # now read the list of players sorted by rank descending in order to acomplish
-    # with the swiss system pairing palyers with the same or near the same rank.
+    # with the swiss system pairing players with the same or almost same rank.
     # here is used the SQL view standings
-    db = connect()
-    c = db.cursor()
-    c.execute("SELECT pid, name, bye FROM standings where tid =%s",(tid,))
-    players = c.fetchall()
+    
+    players = playerStandings(tid, giveme_bye=1)
     
     # check the number of players for even or odd
-    # if odd: take a player (with no bye) and assign him/her a "bye" flag and 
-    # assign a "free win" and pop it from the list of candidates to
+    # if odd: take a random player (with no bye) and assign him/her a "bye" flag 
+    # and a "free win" and them pop it from the list of candidates to
     # pairing
     if len(players) % 2:
         if debug_level>1:
             print '   odd players'
-        for player in players:
+        while True:
+            player = choice(players)
+            print player
             if player[2] == 0: 
                 if debug_level>1:
                     print '   found player with bye = 0, poping it from the list'
@@ -220,7 +213,7 @@ def swissPairings(debug_level=0, tid=0):
         if debug_level>1:
             print '   even players'
 
-    # generates all the possible combinations 
+    # generates all the possible combinations (pairs)
     groups = combinations(players,2)
     
     # this piece of code is the core of the pairing system, it takes the 
@@ -228,8 +221,10 @@ def swissPairings(debug_level=0, tid=0):
     # if it is not into that table: check if any player in the combination
     # have been used in other precedent pair
     # once the new pair passes that two filters will be inserted 
-    # into the pairs list and matches DB table.
-    # 
+    # into the pairs list and matches table.
+    # when even players the list is sorted by wins due to bye=0
+    # when odd players the list is "pseudo sorted" due to one player is 
+    # picked up from the list, so may appears a discontinuity in the sorting 
     pairs = []
     for group in groups:
         pair_to_test = (group[0][0], group[0][1],  group[1][0], group[1][1])
@@ -242,7 +237,7 @@ def swissPairings(debug_level=0, tid=0):
                 print '   pair_to_test NOT IN matches'
             if (not_in(pair_to_test, pairs, debug_level)):
                 if debug_level>1:
-                    print '   pair_to_test NOT IN pairs, inserting into DB *******'
+                    print '   pair_to_test NOT IN pairs, inserting into ----------> DB!'
                 pairs.append((group[0][0], group[0][1], group[1][0], group[1][1]))
                 db = connect()
                 c = db.cursor()
@@ -255,5 +250,5 @@ def swissPairings(debug_level=0, tid=0):
         else: 
             if debug_level>1:
                 print '   pair_to_test IN matches, no insertion'
-
     return pairs
+
