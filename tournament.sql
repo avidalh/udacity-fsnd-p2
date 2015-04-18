@@ -230,13 +230,10 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION register_player(varchar(20), integer, varchar(20))
 RETURNS VOID AS $$
 BEGIN
-	IF EXISTS (SELECT 1 FROM tournaments
+	IF NOT EXISTS (SELECT 1 FROM tournaments
 					WHERE tid =$2)
 		THEN
-    		UPDATE tournaments SET (tname) = ($3);
-    ELSE
-    	INSERT INTO tournaments(tid, tname) VALUES($2, $3);
-    	--RAISE 'NOT EXISTS! INSERT INTO...';
+    		INSERT INTO tournaments(tid, tname) VALUES($2, $3);
     END IF;
     INSERT INTO players(tid,name) VALUES ($2, $1);
 END;
