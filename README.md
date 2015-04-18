@@ -24,11 +24,11 @@ I've adopted the followings weights for the final score table:
 * draw: 1 point  (1x)
 * lose: 0 points (0x)
 * OMW: 1/2 point (0.5x)
+You can change these values in `tournament.sql` at the variables declaration.
 
 All tests in `tournament_test.py` passed and the function 
-`testPairingsAdvanced()` has been added in order to recreate full 
-tournaments setting a random result to every match (winner1, winner2 or draw with 1/3 probability for each result)
-Sometimes many matches draws and so tied rankings may appear even using the OMW system...
+`testPairingsAdvanced()` has been added in order to recreate full tournaments, setting a random result to every match (winner1, winner2 or draw with 1/3 probability for each result).
+Sometimes many matches draws and tied rankings may appear even using the OMW system! Anyway random means random... ;-)
 
 
 Function `testPairingsAdvanced(debug_level)` in `tournament_test.py` has three possible debugging levels:
@@ -60,52 +60,50 @@ SELECT * FROM standings ORDER BY tid, pid;
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
 | tid | tname        | pid |     name | matches | bye | wins | wins_plus_bye | draws | losses |
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
-|   0 | Tournament_1 |  33 | Player_0 |       0 |   0 |    0 |             0 |     0 |      0 |
-|   0 | Tournament_1 |  34 | Player_1 |       0 |   0 |    0 |             0 |     0 |      0 |
-|   0 | Tournament_1 |  35 | Player_2 |       0 |   0 |    0 |             0 |     0 |      0 |
-|   1 | Tournament_1 |  36 | Player_0 |       0 |   0 |    0 |             0 |     0 |      0 |
-|   1 | Tournament_1 |  37 | Player_1 |       0 |   0 |    0 |             0 |     0 |      0 |
-|   1 | Tournament_1 |  38 | Player_2 |       0 |   0 |    0 |             0 |     0 |      0 |
-|   1 | Tournament_1 |  39 | Player_3 |       0 |   0 |    0 |             0 |     0 |      0 |
+|   0 | Tournament_0 | 431 | Player_0 |       0 |   0 |    0 |             0 |     0 |      0 |
+|   0 | Tournament_0 | 432 | Player_1 |       0 |   0 |    0 |             0 |     0 |      0 |
+|   0 | Tournament_0 | 433 | Player_2 |       0 |   0 |    0 |             0 |     0 |      0 |
+|   1 | Tournament_1 | 434 | Player_0 |       0 |   0 |    0 |             0 |     0 |      0 |
+|   1 | Tournament_1 | 435 | Player_1 |       0 |   0 |    0 |             0 |     0 |      0 |
+|   1 | Tournament_1 | 436 | Player_2 |       0 |   0 |    0 |             0 |     0 |      0 |
+|   1 | Tournament_1 | 437 | Player_3 |       0 |   0 |    0 |             0 |     0 |      0 |
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
 execution paused, press <ENTER> 
 tournament 0
 max_rounds:  2
-(33, 'Player_0', 0)
 pairing / round 1 results
 SELECT * FROM view_matches WHERE tid = 0;
-+-----+------+----------+------+----------+--------+
-| tid | pid1 |  player1 | pid2 |  player2 | winner |
-+-----+------+----------+------+----------+--------+
-|   0 | 34   | Player_1 |   35 | Player_2 |     35 |
-+-----+------+----------+------+----------+--------+
++------+-----+------+----------+------+----------+--------+
+|  mid | tid | pid1 |  player1 | pid2 |  player2 | winner |
++------+-----+------+----------+------+----------+--------+
+| 1613 | 0   |  432 | Player_1 |  433 | Player_2 |    432 |
++------+-----+------+----------+------+----------+--------+
 tournament 0 round 1 standings
 SELECT * FROM standings WHERE tid = 0;
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
 | tid | tname        | pid |     name | matches | bye | wins | wins_plus_bye | draws | losses |
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
-|   0 | Tournament_1 |  33 | Player_0 |       0 |   1 |    0 |             1 |     0 |      0 |
-|   0 | Tournament_1 |  35 | Player_2 |       1 |   0 |    1 |             1 |     0 |      0 |
-|   0 | Tournament_1 |  34 | Player_1 |       1 |   0 |    0 |             0 |     0 |      1 |
+|   0 | Tournament_0 | 431 | Player_0 |       0 |   1 |    0 |             1 |     0 |      0 |
+|   0 | Tournament_0 | 432 | Player_1 |       1 |   0 |    1 |             1 |     0 |      0 |
+|   0 | Tournament_0 | 433 | Player_2 |       1 |   0 |    0 |             0 |     0 |      1 |
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
 execution paused, press <ENTER> 
-(34, 'Player_1', 0)
 pairing / round 2 results
 SELECT * FROM view_matches WHERE tid = 0;
-+-----+------+----------+------+----------+--------+
-| tid | pid1 |  player1 | pid2 |  player2 | winner |
-+-----+------+----------+------+----------+--------+
-|   0 | 33   | Player_0 |   35 | Player_2 |     33 |
-|   0 | 34   | Player_1 |   35 | Player_2 |     35 |
-+-----+------+----------+------+----------+--------+
++------+-----+------+----------+------+----------+--------+
+|  mid | tid | pid1 |  player1 | pid2 |  player2 | winner |
++------+-----+------+----------+------+----------+--------+
+| 1614 | 0   |  431 | Player_0 |  432 | Player_1 |      0 |
+| 1613 | 0   |  432 | Player_1 |  433 | Player_2 |    432 |
++------+-----+------+----------+------+----------+--------+
 tournament 0 round 2 standings
 SELECT * FROM standings WHERE tid = 0;
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
 | tid | tname        | pid |     name | matches | bye | wins | wins_plus_bye | draws | losses |
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
-|   0 | Tournament_1 |  33 | Player_0 |       1 |   1 |    1 |             2 |     0 |      0 |
-|   0 | Tournament_1 |  34 | Player_1 |       1 |   1 |    0 |             1 |     0 |      1 |
-|   0 | Tournament_1 |  35 | Player_2 |       2 |   0 |    1 |             1 |     0 |      1 |
+|   0 | Tournament_0 | 431 | Player_0 |       1 |   1 |    0 |             1 |     1 |      0 |
+|   0 | Tournament_0 | 432 | Player_1 |       2 |   0 |    1 |             1 |     1 |      0 |
+|   0 | Tournament_0 | 433 | Player_2 |       1 |   1 |    0 |             1 |     0 |      1 |
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
 reached the needed number of rounds to get a champion, tournament 1 ended!
 execution paused, press <ENTER> 
@@ -113,42 +111,42 @@ tournament 1
 max_rounds:  2
 pairing / round 1 results
 SELECT * FROM view_matches WHERE tid = 1;
-+-----+------+----------+------+----------+--------+
-| tid | pid1 |  player1 | pid2 |  player2 | winner |
-+-----+------+----------+------+----------+--------+
-|   1 | 36   | Player_0 |   37 | Player_1 |     37 |
-|   1 | 38   | Player_2 |   39 | Player_3 |     39 |
-+-----+------+----------+------+----------+--------+
++------+-----+------+----------+------+----------+--------+
+|  mid | tid | pid1 |  player1 | pid2 |  player2 | winner |
++------+-----+------+----------+------+----------+--------+
+| 1615 | 1   |  434 | Player_0 |  435 | Player_1 |    434 |
+| 1616 | 1   |  436 | Player_2 |  437 | Player_3 |      0 |
++------+-----+------+----------+------+----------+--------+
 tournament 1 round 1 standings
 SELECT * FROM standings WHERE tid = 1;
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
 | tid | tname        | pid |     name | matches | bye | wins | wins_plus_bye | draws | losses |
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
-|   1 | Tournament_1 |  37 | Player_1 |       1 |   0 |    1 |             1 |     0 |      0 |
-|   1 | Tournament_1 |  39 | Player_3 |       1 |   0 |    1 |             1 |     0 |      0 |
-|   1 | Tournament_1 |  36 | Player_0 |       1 |   0 |    0 |             0 |     0 |      1 |
-|   1 | Tournament_1 |  38 | Player_2 |       1 |   0 |    0 |             0 |     0 |      1 |
+|   1 | Tournament_1 | 434 | Player_0 |       1 |   0 |    1 |             1 |     0 |      0 |
+|   1 | Tournament_1 | 435 | Player_1 |       1 |   0 |    0 |             0 |     0 |      1 |
+|   1 | Tournament_1 | 436 | Player_2 |       1 |   0 |    0 |             0 |     1 |      0 |
+|   1 | Tournament_1 | 437 | Player_3 |       1 |   0 |    0 |             0 |     1 |      0 |
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
 execution paused, press <ENTER> 
 pairing / round 2 results
 SELECT * FROM view_matches WHERE tid = 1;
-+-----+------+----------+------+----------+--------+
-| tid | pid1 |  player1 | pid2 |  player2 | winner |
-+-----+------+----------+------+----------+--------+
-|   1 | 36   | Player_0 |   37 | Player_1 |     37 |
-|   1 | 36   | Player_0 |   38 | Player_2 |     38 |
-|   1 | 37   | Player_1 |   39 | Player_3 |      0 |
-|   1 | 38   | Player_2 |   39 | Player_3 |     39 |
-+-----+------+----------+------+----------+--------+
++------+-----+------+----------+------+----------+--------+
+|  mid | tid | pid1 |  player1 | pid2 |  player2 | winner |
++------+-----+------+----------+------+----------+--------+
+| 1615 | 1   |  434 | Player_0 |  435 | Player_1 |    434 |
+| 1617 | 1   |  434 | Player_0 |  435 | Player_1 |    434 |
+| 1616 | 1   |  436 | Player_2 |  437 | Player_3 |    436 |
+| 1618 | 1   |  436 | Player_2 |  437 | Player_3 |    436 |
++------+-----+------+----------+------+----------+--------+
 tournament 1 round 2 standings
 SELECT * FROM standings WHERE tid = 1;
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
 | tid | tname        | pid |     name | matches | bye | wins | wins_plus_bye | draws | losses |
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
-|   1 | Tournament_1 |  37 | Player_1 |       2 |   0 |    1 |             1 |     1 |      0 |
-|   1 | Tournament_1 |  38 | Player_2 |       2 |   0 |    1 |             1 |     0 |      1 |
-|   1 | Tournament_1 |  39 | Player_3 |       2 |   0 |    1 |             1 |     1 |      0 |
-|   1 | Tournament_1 |  36 | Player_0 |       2 |   0 |    0 |             0 |     0 |      2 |
+|   1 | Tournament_1 | 434 | Player_0 |       2 |   0 |    2 |             2 |     0 |      0 |
+|   1 | Tournament_1 | 436 | Player_2 |       2 |   0 |    2 |             2 |     0 |      0 |
+|   1 | Tournament_1 | 435 | Player_1 |       2 |   0 |    0 |             0 |     0 |      2 |
+|   1 | Tournament_1 | 437 | Player_3 |       2 |   0 |    0 |             0 |     0 |      2 |
 +-----+--------------+-----+----------+---------+-----+------+---------------+-------+--------+
 reached the needed number of rounds to get a champion, tournament 1 ended!
 execution paused, press <ENTER> 
@@ -156,24 +154,24 @@ execution paused, press <ENTER>
 FINAL RANKINGS:
 
 Tournament 0 results:
-SELECT * FROM v_final_score WHERE tid = 0;
+SELECT * FROM final_score WHERE tid = 0;
 +-----+--------------+-----+----------+---------+-----+------+-------+--------+------+-------+
 | tid | tname        | pid |     name | matches | bye | wins | draws | losses |  omw | score |
 +-----+--------------+-----+----------+---------+-----+------+-------+--------+------+-------+
-|   0 | Tournament_1 |  33 | Player_0 |       1 |   1 |    1 |     0 |      0 | 2.00 |  4.50 |
-|   0 | Tournament_1 |  34 | Player_1 |       1 |   1 |    0 |     0 |      1 | 2.00 |  2.50 |
-|   0 | Tournament_1 |  35 | Player_2 |       2 |   0 |    1 |     0 |      1 | 1.00 |  2.25 |
+|   0 | Tournament_0 | 431 | Player_0 |       1 |   1 |    0 |     1 |      0 | 2.00 |  4.00 |
+|   0 | Tournament_0 | 432 | Player_1 |       2 |   0 |    1 |     1 |      0 | 0.00 |  3.00 |
+|   0 | Tournament_0 | 433 | Player_2 |       1 |   1 |    0 |     0 |      1 | 2.00 |  3.00 |
 +-----+--------------+-----+----------+---------+-----+------+-------+--------+------+-------+
 
 Tournament 1 results:
-SELECT * FROM v_final_score WHERE tid = 1;
+SELECT * FROM final_score WHERE tid = 1;
 +-----+--------------+-----+----------+---------+-----+------+-------+--------+------+-------+
 | tid | tname        | pid |     name | matches | bye | wins | draws | losses |  omw | score |
 +-----+--------------+-----+----------+---------+-----+------+-------+--------+------+-------+
-|   1 | Tournament_1 |  39 | Player_3 |       2 |   0 |    1 |     1 |      0 | 2.00 |  3.50 |
-|   1 | Tournament_1 |  37 | Player_1 |       2 |   0 |    1 |     1 |      0 | 1.00 |  3.25 |
-|   1 | Tournament_1 |  38 | Player_2 |       2 |   0 |    1 |     0 |      1 | 1.00 |  2.25 |
-|   1 | Tournament_1 |  36 | Player_0 |       2 |   0 |    0 |     0 |      2 | 2.00 |  0.50 |
+|   1 | Tournament_1 | 436 | Player_2 |       2 |   0 |    2 |     0 |      0 | 0.00 |  4.00 |
+|   1 | Tournament_1 | 434 | Player_0 |       2 |   0 |    2 |     0 |      0 | 0.00 |  4.00 |
+|   1 | Tournament_1 | 435 | Player_1 |       2 |   0 |    0 |     0 |      2 | 2.00 |  1.00 |
+|   1 | Tournament_1 | 437 | Player_3 |       2 |   0 |    0 |     0 |      2 | 2.00 |  1.00 |
 +-----+--------------+-----+----------+---------+-----+------+-------+--------+------+-------+
 9. A complete simulation for all tournaments ended successfully!.
 Success!  All tests pass!

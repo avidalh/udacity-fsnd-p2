@@ -41,7 +41,7 @@ def countPlayers():
     """Returns the number of players currently registered."""
     db = connect()
     c = db.cursor()
-    c.execute("SELECT count(pid)from players")
+    c.execute("SELECT COUNT(pid) FROM players")
     count = c.fetchone()
     db.close()
     return count[0];
@@ -171,33 +171,20 @@ def swissPairings(debug_level=0, tid=0):
         default value of 0 for compatibility with udacity tests file.
     """
 
-    # in first instance read the list of matches played (even if it is empty)
-    # by means of a SQL view 'view_matches'
-    db = connect()
-    c = db.cursor()
-    c.execute("SELECT pid1, player1, pid2, player2 FROM view_matches")
-    matches = c.fetchall()
-    db.close()
-    
-    if debug_level>1: 
-        print '   matches: ', matches  
-    
-    # now read the list of players sorted by rank descending in order to acomplish
-    # with the swiss system pairing players with the same or almost same rank.
-    # here is used the SQL view standings
-    
+    # in first instance read the list of players sorted by rank descending, in 
+    # order to acomplish with the swiss system (pairing players with the same
+    # or almost same rank) Uses 'giveme_bye' to know who has a bye or not to
+    # support even or odd number of players
     players = playerStandings(tid, giveme_bye=1)
     
     # check the number of players for even or odd
     # if odd: take a random player (with no bye) and assign him/her a "bye" flag 
-    # and a "free win" and them pop it from the list of candidates to
-    # pairing
+    # and a "free win" and then pop it from the list of candidates to pair
     if len(players) % 2:
         if debug_level>1:
             print '   odd players'
         while True:
             player = choice(players)
-            print player
             if player[2] == 0: 
                 if debug_level>1:
                     print '   found player with bye = 0, poping it from the list'
@@ -217,38 +204,27 @@ def swissPairings(debug_level=0, tid=0):
     groups = combinations(players,2)
     
     # this piece of code is the core of the pairing system, it takes the 
-    # combinations and check against the matches table, 
-    # if it is not into that table: check if any player in the combination
-    # have been used in other precedent pair
-    # once the new pair passes that two filters will be inserted 
-    # into the pairs list and matches table.
-    # when even players the list is sorted by wins due to bye=0
-    # when odd players the list is "pseudo sorted" due to one player is 
-    # picked up from the list, so may appears a discontinuity in the sorting 
+    # combinations and check if any player in the combination have been 
+    # used in other precedents pair.
+    # will be inserted into the pairs list and matches table.
     pairs = []
     for group in groups:
         pair_to_test = (group[0][0], group[0][1],  group[1][0], group[1][1])
         if debug_level>1:
             print '   pair_to_test: ', pair_to_test
-        if debug_level>1:
-            print '   matches: ', matches
-        if pair_to_test not in matches:
+            print '   pairs: ', pairs
+        if (not_in(pair_to_test, pairs, debug_level)):
             if debug_level>1:
-                print '   pair_to_test NOT IN matches'
-            if (not_in(pair_to_test, pairs, debug_level)):
-                if debug_level>1:
-                    print '   pair_to_test NOT IN pairs, inserting into ----------> DB!'
-                pairs.append((group[0][0], group[0][1], group[1][0], group[1][1]))
-                db = connect()
-                c = db.cursor()
-                c.execute("INSERT INTO matches(pid1,pid2) VALUES(%s,%s)", (group[0][0], group[1][0],))
-                db.commit() 
-                db.close()
-            else:
-                if debug_level>1:
-                    print '   pair_to_test has one player IN pairs, no insertion'
-        else: 
+                print '   pair_to_test NOT IN pairs, inserting into ----------> DB!'
+            pairs.append((group[0][0], group[0][1], group[1][0], group[1][1]))
+            db = connect()
+            c = db.cursor()
+            c.execute("INSERT INTO matches(pid1,pid2) \
+                            VALUES(%s,%s)", (group[0][0], group[1][0],))
+            db.commit() 
+            db.close()
+        else:
             if debug_level>1:
-                print '   pair_to_test IN matches, no insertion'
+                print '   pair_to_test has one player IN pairs, no insertion'
     return pairs
 

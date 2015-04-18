@@ -45,20 +45,22 @@ CREATE TABLE players(
 
 -- Matches table, used for store pairings and results of every match
 -- ON DELETE CASCADE propagates deletes from players or tournaments...
-CREATE TABLE matches(					
+CREATE TABLE matches(	
+	mid serial,				
 	pid1 int REFERENCES players(pid) 
 		ON DELETE CASCADE, 					-- player 1 in the match
 	pid2 int REFERENCES players(pid) 
 		ON DELETE CASCADE, 					-- player 2 in the match
 	winner int,								-- match winner
-	PRIMARY KEY (pid1, pid2)				-- primary key player's id.
+	PRIMARY KEY (mid)						-- primary key
 	);
 
 
 -- Some usefull views:
 -- view the matches with player's name and winner and etc.
 CREATE VIEW view_matches AS
-	SELECT 	p1.tid AS "tid",	
+	SELECT 	matches.mid,
+			p1.tid AS "tid",	
 			p1.pid AS "pid1", 
 			p1.name AS "player1", 
 			p2.pid AS "pid2", 
@@ -142,7 +144,7 @@ CREATE VIEW standings AS
 -- it's a bit complex view compounds by one UNION, a JOIN and some math.
 -- the weights for wins, draws and losses are the same above and OMW has 0.5x
 -- to figure out OMW is used the number of victories excluded the bye(free-wins)
-CREATE VIEW v_final_score AS
+CREATE VIEW final_score AS
 	SELECT 	p.tid,
 			p.tname,
 			p.pid, 
@@ -252,22 +254,3 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
--- -- -- just to test, delete before submit!!!
--- INSERT INTO tournaments (tid, tname) VALUES(0, 'tour 0');
--- INSERT INTO tournaments (tid, tname) VALUES(1, 'tour 1');
-
--- INSERT INTO players(tid, name) VALUES(0,'name 0');
--- INSERT INTO players(tid, name) VALUES(0,'name 1');
--- INSERT INTO players(tid, name) VALUES(0,'name 2');
--- INSERT INTO players(tid, name) VALUES(0,'name 3');
--- INSERT INTO players(tid, name) VALUES(1,'name 4');
--- INSERT INTO players(tid, name) VALUES(1,'name 5');
--- INSERT INTO players(tid, name) VALUES(1,'name 6');
--- INSERT INTO players(tid, name) VALUES(1,'name 7');
-
--- INSERT INTO matches(pid1, pid2, winner) VALUES(1,2,1);
--- INSERT INTO matches(pid1, pid2, winner) VALUES(3,4,4);
--- INSERT INTO matches(pid1, pid2, winner) VALUES(1,3,0);
--- INSERT INTO matches(pid1, pid2, winner) VALUES(5,6,1);
--- INSERT INTO matches(pid1, pid2, winner) VALUES(7,8,0);
