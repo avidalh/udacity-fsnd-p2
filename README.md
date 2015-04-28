@@ -8,9 +8,9 @@ The project has these files:
 * `tournament_test.py`: main file to test the `tournament.py` functions.
 
 In order to use the program you should:
-1.- clone the git repository
-2.- use `tournament.sql`to create the database using `\i tournament.sql` command from psql environment
-3.- run the program typewriting `python tournament_test.py` from the command line and evaluate
+- clone the git repository
+- use `tournament.sql`to create the database using `\i tournament.sql` command from psql environment
+- run the program typewriting `python tournament_test.py` from the command line and evaluate
 
 The functions have support for:
 * both even and odd number of players
